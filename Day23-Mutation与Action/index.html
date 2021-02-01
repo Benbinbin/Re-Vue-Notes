@@ -46,11 +46,11 @@
       methods: {
         // 数组形式
         ...mapMutations([
-          'increment', // 将 `this.increment()` 映射为 `this.$store.commit('increment')`；调用方法时支持载荷，将 `this.increment(amount)` 映射为 `this.$store.commit('increment', amount)`
+          'increment', // 将 this.increment() 映射为 this.$store.commit('increment')；调用方法时支持载荷，将 this.increment(amount) 映射为 this.$store.commit('increment', amount)
         ]),
         // 对象形式，可重命名 method
         ...mapMutations({
-          add: 'increment' // 将 `this.add()` 映射为 `this.$store.commit('increment')`
+          add: 'increment' // 将 this.add() 映射为 this.$store.commit('increment')
         })
       }
     }
@@ -73,7 +73,7 @@
     }
     **/
 
-    // 在组件中类似于分化事件一样去分化一个特定 Action 事件类型，以调用相应的函数：store.dispatch('actionType')，可以传入第二个参数称为载荷 payload（一般是对象，以传递数据到 handler）
+    // 在组件中类似于分发 dispatch 事件一样去分发 dispatch 一个特定 Action 事件类型，以调用相应的函数：store.dispatch('actionType')，可以传入第二个参数称为载荷 payload（一般是对象，以传递数据到 handler）
 
     // 可以在组件中使用 mapActions 辅助函数，将组件中的 methods 映射为 store.dispatch 调用，方便后续直接在组件中提交 mutation，也是可以通过对象或数组形式进行传递
 
