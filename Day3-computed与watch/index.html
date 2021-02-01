@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>computed 与 watch</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+</head>
+
+<body>
+  <div id="app">
+    {{ reverseMessage }}
+  </div>
+  <script>
+    let vm = new Vue({
+      el: '#app',
+      data: {
+        message: 'Hello'
+      },
+      computed: {
+        reverseMessage: function() {
+          return this.message.split('').reverse().join('');
+        }
+      }
+    })
+    // computed: 将复杂和需要重用的资料处理逻辑，从模板中的函数表达式提出来
+    // computed 需要有响应式依赖（基于 data 响应式数据）并在模板上有使用，才会实时更新
+    /**
+     * computed 可以使用对象分别具有 get 和 set 属性。其中 getter 属性是基于 data 返回计算的值；setter 属性是直接为 computed 赋值时（computed property = value），反过来设定所依赖的 data property
+     */
+    // ...
+      // computed: {
+      //   fullName: {
+      //     // getter
+      //     get: function () {
+      //       return this.firstName + ' ' + this.lastName
+      //     },
+      //     // setter
+      //     set: function (newValue) {
+      //       var names = newValue.split(' ')
+      //       this.firstName = names[0]
+      //       this.lastName = names[names.length - 1]
+      //     }
+      //   }
+      // }
+    // ...
+
+    // watch 也是响应式依赖（每个 watch 都只能针对一个 data property，相比 computed 可以同时侦听多个 data properties），但它一般是基于 data 数据的变化，执行异步操作，可以设置中间状态
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>插件和过滤器</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+  <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+</head>
+
+<body>
+  <div id="app">
+    <button @click="log('click')">Click Me</button>
+    {{ first }} - {{ last | Upper }}
+  </div>
+  <script>
+    /**
+     * 插件
+     */
+    // 插件通常用来为 Vue 添加全局功能，如 vue-router，可以将插件作为载体，一次载入多种预设功能，如全局方法或 property，全局指令，全局 mixin，实例方法等。
+    // 插件应该暴露一个 install 方法，第一个参数是 Vue 构造器（实例），第二个参数是一个可选的选项对象
+    // 使用模块化机制编程时，如 webpack 等提供的 CommonJS 模块环境，引入后还要调用方法 Vue.use(PluginName, { someOption: true }) 注册插件以实现全局混入。插件的引入需要在调用 new Vue() 启动应用之前完成
+    // Vue.use 会自动阻止多次注册相同插件，届时即使多次调用也只会注册一次该插件。
+
+    /**
+     * 过滤器
+     */
+    // 过滤器被用于一些常见的文本格式化
+    // 可以在一个组件的选项中通过属性 filters 定义本地的过滤器
+    // filters: {
+    //   filterName: function() {...}
+    // }
+    // 或者在创建 Vue 实例之前全局定义过滤器
+    // Vue.filter('filterName', function () {...})
+
+    // 过滤器可以用在两个地方：双花括号插值和 v-bind 表达式
+    // 过滤器应该被添加在 JavaScript 表达式的尾部，由「管道」符号指示 {{ value | filterName }}，过滤器函数总接收 JavaScript 表达式的值
+    // 过滤器是 JavaScript 函数，因此可以接收参数，当过滤器前的值会作为第一个参数，主动传入的数据是作为第二个参数开始传递的。
+
+    const LogPlugin = {
+      install: function (Vue, options) {
+        // console.log(Vue, options);
+        Vue.mixin({
+          methods: {
+            log(...args) {
+              console.log(...args);
+            }
+          }
+        })
+      }
+    }
+
+    Vue.use(LogPlugin, { test: true })
+
+    Vue.filter('Upper', function(value) {
+        return value.charAt(0).toUpperCase() + value.slice(1)
+    })
+
+    new Vue({
+      el: '#app',
+      data: {
+        first: 'Ben',
+        last: 'thomson'
+      },
+    })
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数据双向绑定</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+</head>
+
+<body>
+  <div id="app">
+    <p>{{ text }}</p>
+    <div>
+      <input type="text" v-model="text" />
+    </div>
+    <div>
+      <textarea name="" id="" cols="30" rows="10" v-model="text"></textarea>
+    </div>
+    <div>
+      <input type="checkbox" name="" id="" v-model="edm"> 订阅
+    </div>
+    <div>
+      <input type="checkbox" name="" id="" value="A" v-model="check">A
+      <input type="checkbox" name="" id="" value="B" v-model="check">B
+      <input type="checkbox" name="" id="" value="C" v-model="check">C
+      <p>{{ check }}</p>
+    </div>
+    <div>
+      <input type="radio" name="" id="" value="A1" v-model="radio">A1
+      <input type="radio" name="" id="" value="B1" v-model="radio">B1
+      <input type="radio" name="" id="" value="C1" v-model="radio">C1
+      <p>{{ radio }}</p>
+    </div>
+    <select v-model="selected">
+      <option disabled value="">Please select one</option>
+      <option>A</option>
+      <option>B</option>
+      <option>C</option>
+    </select>
+    <p>Select: {{ selected }}</p>
+  </div>
+  <script>
+    /**
+     * 双向绑定
+     */
+
+    // 使用 v-model，针对表单 input textarea select 输入数据修改 data
+    // input type="checkbox" 可以绑定 boolean（单选，使用 type="radio" 更适合）或数组（多选，数组元素的顺序基于勾选顺序）
+    // 注意表单的值默认是字符串，如果希望 data 保存的是数值类型，可以使用表单修饰符 .number
+    // 表单修饰符 .trim 自动过滤用户输入的首尾空白字符；.lazy 在 change 事件之后（失去焦点后）进行数据同步（默认是在 input 事件触发后）
+
+    // select 元素进行双向绑定后，基于其中选中 option value 值进行改变
+    new Vue({
+      el: '#app',
+      data: {
+        text: 'Ben',
+        edm: false,
+        check: [],
+        radio: 'A1',
+        selected: 'A'
+      },
+    })
+  </script>
+</body>
+
+</html>

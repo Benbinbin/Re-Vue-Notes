@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>过渡与动画</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script> -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.14.1/lodash.min.js"></script>
+  <style>
+    .fade-enter {
+      opacity: 0;
+    }
+
+    .fade-enter-active {
+      transition: opacity 1s
+    }
+
+    .fade-enter-to {
+      opacity: 1;
+    }
+
+    .fade-leave {
+      opacity: 1;
+    }
+
+    .fade-leave-active {
+      transition: opacity 1s
+    }
+
+
+    .fade-leave-to {
+      opacity: 0;
+    }
+
+    .fade-move {
+      transition: transform 1s;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <!-- <button @click="show = !show">
+      Toggle render
+    </button> -->
+    <!-- <transition name="fade">
+      <p v-if="show">Hello World!</p>
+    </transition> -->
+    <!-- 使用 Animate.css，需要使用自定义过渡的类名 -->
+    <!-- <transition enter-active-class="animate__animated animate__shakeX">
+      <p v-if="show">Hello World!</p>
+    </transition> -->
+    <!-- 使用 JS hook -->
+    <!-- <transition @before-enter="beforeEnterHandler" @enter="enterHandler" @after-enter="afterEnterHandler"
+      @leave="leaveHandler" :css="false">
+      <p v-if="show">Hello World!</p>
+    </transition> -->
+    <button @click="clickHandler">shuffle</button>
+    <transition-group tag="div" name="fade">
+    <p v-for="num of items" :key="num">{{ num }}</p>
+    </transition-group>
+  </div>
+  <script>
+    /**
+     * 元素（进入/离开）或列表重排过渡
+     */
+    // 过渡是主要针对元素素进入（显示）/离开（隐藏）和列表（重排）的情况设置动效，基于 CSS3 的 transition 和 animation 实现
+    // 触发动画的情况：条件渲染 v-if、条件显示 v-show、动态组件、组件的根节点。
+    // Vue 提供 <transition name="animationType"></transition> 标签作为容器，为包裹在其中的元素设置进入/离开时的动画，!!!包裹的 DOM 只能有一个根节点。当发生以上所说的触发动画的情况，Vue 会为容器内的元素插入相应的 class 属性，实现预设的动效，并在结束后移除 class 属性。其中 name 指定的值就是 class 属性名称。
+
+    // Vue 允许使用 6 种后缀（替换以下的 v 字符为类名 animationType）更精细地指定在动画不同阶段时元素的样式，如在样式表中以 animationType-enter 为类名设置元素在插入页面开始前的样式
+    // 可以指定动画 6 个位置的状态（Vue 会在对应阶段为元素进行 class 切换）：
+    // 进入
+    // 1. v-enter 定义开始状态，在元素被插入之前生效
+    // 2. v-enter-active 定义进入过渡生效时的状态，在整个进入过渡的阶段中应用，在相应的类名中，使用样式 transition 控制过渡的缓和曲线
+    // 3. v-enter-to 定义过渡的结束状态（此同时 v-enter 被移除），在过渡/动画完成之后移除
+    // 离开
+    // 1. v-leave 定义开始状态，在离开过渡被触发时立刻生效
+    // 2. v-leave-active 定义离开过渡生效时的状态，在整个离开过渡的阶段中应用，在相应的类名中，使用样式 transition 控制过渡的缓和曲线
+    // 3. v-leave-to 定义离开过渡的结束状态（与此同时 v-leave 被删除），在过渡/动画完成之后移除
+
+    // 如果使用 animation，而不是 transition 控制过渡，则不需要指定 v-enter/v-leave 或 v-enter-to/v-leave-to 的状态，由于在关键帧中指定了 0% 和 100% 状态时的样式
+
+    // 如果要用第三方的 CSS 动画库，如 Animate.css，需要在 DOM 元素上插入特定的类名，可以在标签 <transition></transition> 上使用如下列出的 attribute，这样 Vue 会在触发动画时为容器内的元素相应地添加这些自定义过渡类名：
+    // enter-class="framework-class-name" 在元素进入页面前，添加相应的自定义类名
+    // enter-active-class="framework-class-name"
+    // enter-to-class="framework-class-name"
+    // leave-class="framework-class-name"
+    // leave-active-class="framework-class-name"
+    // leave-to-class="framework-class-name"
+
+    // Vue 可以自动得出过渡效果的完成时机以「拔除」添加到元素上的动画相关的 class 类名，也可以在组件上通过 prop 显式地指定持续时间（以毫秒计）<transition :duration="1000">
+
+    // JavaScript 钩子：如果希望使用 JS 来实现动画，Vue 会在各种可以触发动画的元素变更情况的同时触发相应事件，可以监听这些事件，执行回调函数，以通过 JS （「手动」控制样式）实现动画
+    // 元素进入页面触发的事件
+    // v-on:before-enter="beforeEnter(el)" 可以传递执行动画的元素
+    // v-on:enter="enter(el, done)" 回调函数 done() 在执行结束时调用
+    // v-on:after-enter="afterEnter"
+    // v-on:enter-cancelled="enterCancelled"
+    // 元素离开页面触发的事件
+    // v-on:before-leave="beforeLeave"
+    // v-on:leave="leave"
+    // v-on:after-leave="afterLeave"
+    // v-on:leave-cancelled="leaveCancelled"
+    // 这些钩子函数可以结合 CSS transitions/animations 使用，也可以单独使用。当只用 JS 过渡的时候，在 enter 和 leave 中必须使用 done() 进行回调；否则它们将被同步调用，过渡会立即完成。
+    // 推荐对于仅使用 JS 过渡的元素添加 v-bind:css="false"，Vue 会跳过 CSS 的检测。这也可以避免过渡过程中 CSS 的影响。
+
+    // 可以使用 appear 或 v-on:appear 钩子设置节点初始渲染的过渡
+
+    // 对于使用 v-if/v-else 实现的多元素之间进行切换时，需要注意相同标签名的元素要设置 key 属性作为唯一标识让 Vue 区分它们，否则只会替换相同标签内部的内容。
+    // 在多元素过渡时，默认模式是两个元素的进入&离开是同时进行的，可能会导致页面布局乱掉，可以将模式改成 <transition mode="out-in"></transition> 让当前元素先进行过渡离开，完成之后新元素过渡进入
+
+    // 列表过渡
+    // 使用组件 <transition-group></transition-group> 作为容器，其中可以包裹多个节点（而 <transition> 只允许一个根节点），它默认渲染为一个 <span> 作为容器包裹列表，可以通过 tag="div" 更换为其他元素，如 div。内部的各个节点总是需要提供属性 key 作为唯一标识
+    // 也是使用相同的 6 个 class 后缀指定在不同动画状态下元素的样式。此外还特别针对性地新增了 v-move 后缀，以设置列表元素改变定位（重排）时的动果，一般结合 transform 样式属性使用。该动效对于 display: inline 元素无效，可以将元素，如 <span> 设置为 display: inline-block
+
+    // 动态过渡
+    // Vue 是数据驱动画面的，因此过渡动效的类型也是可以基于数据进行变化的，如通过 <transition v-bind:name="transitionName"> 将属性 name 绑定到变量，就可以实时操作动效的类型，例如实现轮播图点击左右箭头时切换方向的不同。
+
+    /**
+     * 状态过渡
+     */
+    // 对于元素的资料本身的改变也可以设置动效，包括数字和运算、颜色的显示、SVG 节点的位置、元素的大小和其他的 property
+    // 一般以数值表示的样式属性都可以设置动效，可以结合 Vue 的响应式和组件系统，使用第三方库来实现切换元素的过渡状态，如 tween.js
+
+    Vue.component('BasicComponent', {
+    })
+
+    new Vue({
+      el: '#app',
+      data: {
+        show: true,
+        items: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+      },
+      methods: {
+        // beforeEnterHandler(el) {
+        //   $(el).css({ opacity: 0 })
+        // },
+        // enterHandler(el, done) {
+        //   $(el).fadeTo(400, 1, done)
+        // },
+        // afterEnterHandler(el) {
+        //   $(el).css({ opacity: '' })
+        // },
+        // leaveHandler(el, done) {
+        //   $(el).fadeOut(400, done)
+        // },
+        clickHandler() {
+         this.items = _.shuffle(this.items)
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>

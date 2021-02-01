@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+  <!-- 引入 Vue 后再引入相关的插件 -->
+  <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+  <script src="https://unpkg.com/vuex/dist/vuex.js"></script>
+</head>
+
+<body>
+  <div id="app">
+    count: {{ $store.state.count }}
+  </div>
+  <script>
+    /**
+     * Module
+     */
+    // Vuex 允许我们将 store 分割成模块（module），每个模块拥有自己的 state、mutation、action、getter、甚至是嵌套子模块
+
+
+    // 实例化 store
+    const store = new Vuex.Store({
+      // 状态
+      state: {
+        count: 1,
+      },
+      // Mutation
+      mutations: {
+        // INCREMENT(state) {
+        //   state.count++
+        // },
+        SET_COUNT(state, count) {
+          state.count = count;
+        }
+      },
+      // Action
+      actions: {
+        increment({ commit, state }, payload) {
+          return new Promise((resolve, reject) => {
+            commit(SET_COUNT, state.count + 1);
+            resolve(state.count)
+          })
+        }
+      }
+    });
+
+    // 创建和挂载 Vue 根实例
+    new Vue({
+      el: '#app',
+      data: {},
+      // 注册 store
+      store,
+
+    })
+  </script>
+</body>
+
+</html>

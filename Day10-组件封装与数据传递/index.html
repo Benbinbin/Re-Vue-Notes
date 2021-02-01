@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>组件封装与数据传递</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+</head>
+
+<body>
+  <div id="app">
+    <basic-component :basic-name="5"></basic-component>
+    <!-- <adv-component></adv-component> -->
+    <input-component class="new" placeholder="ben"></input-component>
+  </div>
+  <script>
+    /**
+     * 组件封装
+     */
+
+    // 组件名称建议字母全小写，且对于多个单词组成的使用连字号分隔
+
+    // 全局注册：使用 Vue 的原型上的方法注册一个全局的组件
+    // Vue.component('name', {
+    //   options,
+    //   template: {...}
+    // })
+    // ！！！需要在 new Vue 之前进行全局组件的注册，以便后续使用
+
+    // 全局注册组件之后，它可以在任何新创建的 Vue 根实例 (new Vue) 的模板以 <tag> 的形式使用
+    // 全局注册组件在所有子组件中的模板中，也都可以以 <tag> 的形式相互使用
+
+    // 局部注册：通过一个普通的 JavaScript 对象来定义组件（相当于提供组件的 options），然后在 vue 实例的 components 属性中定义你想要使用的组件
+    // 在模板中引用组件就是注册时 property 的名字
+    // 局部注册的组件在其他子组件中不可用
+    // 如果希望子组件的模板中引用其他子组件，需要在该子组件的配置中添加 components 属性
+
+    // 如果需要使用大量的组件，可以将组件放置在一个 components 目录，然后使用 ES6 模块系统进行汇总引入
+    // 如果使用 webpack 工具，可以在入口文件进行配置，实现自动引入并进行全局注册这些基础组件，参考：https://vuejs.org/v2/guide/components-registration.html#Automatic-Global-Registration-of-Base-Components
+
+    /**
+     * 组件间数据传递
+     */
+    // props 用于接收父组件传递的数据：需要在子组件的选项的属性 props 中预先设置会有哪些 prop，可以以字符串数组形式列出，也可以以对象形式列出（可指定 prop 接收的数据类型）
+
+    // 如果在父组件中传入的数据是非字符串的，需要通过绑定 v-bind:propName 的方式来传递（即使传递纯数字这一类的静态值）；因为直接传递数据都会转换为字符串
+    // 如果 prop 是 Boolean 类型，但在引用组件中没有设置该 prop，则实例化后该组件的这个 prop 预设为 false；而使用引用组件时，设置了该 prop 但没有提供 true/false 值（no value 的情况），就会设置为 true。类似地，需要使用 v-bind 来传递非字符串的数据
+
+    // 如果希望将一个对象的所有属性「拆分」为多个 prop 分别传入，可以使用不带参数的 v-bind (即 v-bind: obj)，所以可以将大量的 prop 包装进一个对象，一次绑定到组件上
+
+    // prop 应该遵循单向数据流，即不应该在子组件中修改 prop 值（因为这些数据是在父层的，修改也应该只能在父层做修改，子组件只应该 $emit 事件传出需要更新的数据）
+    // 如果希望更新数据，可以通过两种方式：
+    // 1. 以 prop 传递来的数据作为一个初始值，在子组件接下来，拷贝到自己 data 的一个变量中
+    // 2. 基于 prop 定义一个计算属性，实现对原始的值的转换
+
+    // prop 验证：为组件的 prop 指定验证要求
+    // 以嵌套对象的形式，为每个 prop 提供一个带有验证需求的对象
+    // propA: {
+    //   type: String,
+    //   required: true,
+    //   default: value,   // 如果数据类型是 boolean，默认值是 false
+    //   validator: func()   // 验证传入的数据，返回 true/false，以便在控制台中输出提示
+    // }
+    // 注意 prop 会在一个组件实例创建之前进行验证，所以组件的 data 或 computed 数据在此阶段无法访问使用
+
+    // 非 prop 的 attribute：未在组件的 props 属性中显式声明的，但在引用组件时传递给子组件的 attribute，这些 attribute 会被添加到这个组件的根元素上（即 template 中作为容器的第一层的 <tag>，如果已有预设相应的 attribute 就会被新传入的值覆盖）
+    // 如果引用组件时，设置的 attribute 是 class 或 style，会将它们与组件根元素上的 class 或 style 合并，而非取代
+    // 如果希望 attribute 添加到组件的特定元素上，可以设定组件的属性 inheritAttrs: false 并在模板相应的组件绑定 v-bind="$attrs"，但 class 和 style 不能指定到组件的非根元素上
+    // 该功能在刻可以提供自定义属性的 UI 组件十分实用
+
+    const BasicComponent = {
+      // props: ['basicName'],
+      props: {
+        basicName: Number,
+      },
+      template: `<div>{{ basicName }}</div>`,
+    };
+
+    // const AdvComponent = {
+    //   template: `<basic-component></basic-component>`,
+    //   // 在该子组件中「注册」需要使用的其他子组件
+    //   components: {
+    //     BasicComponent
+    //   }
+    // }
+
+    const InputComponent = {
+      template: `
+      <label>
+        输入
+        <input type="text" class="default" v-bind="$attrs"/>
+      </label>`,
+      inheritAttrs: false,
+    }
+
+    // 全局注册
+    Vue.component('basic-component', BasicComponent)
+    // Vue.component('adv-component', AdvComponent)
+
+    new Vue({
+      el: '#app',
+      data: {},
+      // 局部注册
+      components: {
+        // 'basic-component': BasicComponent,
+        // AdvComponent
+        InputComponent
+      }
+
+    })
+  </script>
+</body>
+
+</html>

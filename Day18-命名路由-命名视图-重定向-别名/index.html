@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>命名路由-命名视图-重定向-别名</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+  <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+  <style>
+    .router-link-exact-active {
+      color: white;
+      background-color: rgb(67, 211, 247);
+      padding: 5px;
+    }
+
+    .page {
+      margin: 30px;
+      border: 10px solid orange;
+      min-height: 100px;
+      text-align: center;
+      line-height: 100px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <router-view name="header"></router-view>
+    <router-view name="nav"></router-view>
+    <router-view></router-view>
+  </div>
+  <script>
+    /**
+     * 命名路由
+     */
+    // 可以在配置组件-路由的映射规则时，通过属性 name 给某个路由设置名称，对于路径较长的路由更方便调用
+    // 要链接到一个命名路由，可以给 <router-link> 的 to 属性（以绑定的方式传递）传一个对象，其中包含 name 属性，以指定链接的路径；还可以设置 params 添加动态路径
+    // <router-link :to="{ name: 'user', params: { userId: 123 }}">User</router-link>
+    // 把路由导航到 /user/123 路径
+    // ！！！而如果使用 path（绝对路径）指定链接的路径，则会忽略 params 属性
+
+    /**
+     * 命名视图
+     */
+    // 可以在页面中同时设置多个 <router-view>（平行关系，而不是通过嵌套路由和嵌套的 <router-view> 实现），为每个视图设置名称 <router-view name="viewName> 没有设置名字默认为 default，相应地在 router 的配置中对于同个路由应该设置多个组件（如果组件数量少于 <router-view> 数量，则相应的视图将不会渲染），通过属性 components 设置多个组件，键为视图的命名，值为组件名
+    // {
+    //   path: '/pathName',
+    //   components: {
+    //     default: Index,
+    //     viewName1: Component1,
+    //     viewName2: Component2
+    //   }
+    // }
+
+    // 同一个页面设置多个 <router-view> 可以实现不同路由复用同一个布局模板
+    // 嵌套路由设置多个 <router-view> 可以实行不同（嵌套）路由使用不同的布局
+
+    /**
+     * 重定向
+     */
+    // 在 router 配置路由-组件映射关系时，可以不设置 component 属性，而是设置 redirect 属性，当访问匹配路径时重定向到指定的路径
+    // 相当于 $router.replace(location) 不会在 history 中新增记录
+
+    /**
+     * 别名
+     */
+    // 在 router 配置路由-组件映射关系时，可以设置 alias 属性，为当前路由设置「别名」，该功能让你可以自由地将 UI 结构映射到任意的 URL，而不是受限于配置的嵌套路由结构。
+    // {
+    //   path: '/a',
+    //     component: A,
+    //     children: [
+    //       {
+    //         path: 'a1',
+    //         component: 'A1',
+    //         alias: '/b'
+    //       }
+    //     ]
+    // }
+    // 即访问 /b 相当于访问 /a/a1，页面的视图渲染相同的组件，即实现多个网址指向同一个页面
+
+    // 定义组件
+    const Header = {
+      template: `
+        <div>
+          <router-link to="/">Index</router-link>
+          <router-link to="/page1">Page1</router-link>
+          <router-link :to="{name: 'user', params: {id: 123}}">User 123</router-link>
+          <router-link to="/user/profile">User Profile</router-link>
+          <button @click="$router.push({name: 'user', params: {id: 123}})">User 123</button>
+        </div>
+      `
+    }
+    const Index = {
+      template: `<div  class="page">Index</div>`
+    };
+    const Page1 = {
+      template: `<div  class="page">Page1</div>`
+    };
+    const Page2 = {
+      template: `<div  class="page">Page2</div>`
+    };
+    const User = {
+      template: `<div class="page">
+          <p>User</p>
+          <p>{{$route.params.id}}</p>
+          <router-view></router-view>
+        </div>`
+    };
+    const Profile = {
+      template: `<div  class="page">Profile</div>`
+    };
+    const Error = {
+      template: `<div  class="page">404 Not Found</div>`
+    };
+
+
+    // 创建 router 实例
+    const router = new VueRouter({
+      // 路由规则
+      routes: [
+        {
+          path: '/',
+          // component: Index
+          components: {
+            default: Index,
+            header: Header,
+          },
+          name: 'index'
+        },
+        {
+          path: '/page1',
+          // component: Page1,
+          components: {
+            default: Page1,
+            header: Header,
+            nav: Index
+          },
+          name: 'page1'
+        },
+        {
+          path: '/page2',
+          // component: Page2,
+          components: {
+            default: Page2,
+            header: Header,
+            nav: Index
+          },
+          name: 'page2'
+        },
+        {
+          path: '/user/:id',
+          // component: User,
+          components: {
+            default: User,
+            header: Header,
+            nav: Index
+          },
+          name: 'user',
+          children: [
+            {
+              path: 'profile',
+              component: Profile,
+              name: 'user-profile'
+            }
+          ]
+        },
+        {
+          path: '/404',
+          component: Error
+        },
+        {
+          path: '*',
+          redirect: '/404'
+        }
+      ]
+    })
+
+    // 创建和挂载 Vue 根实例
+    new Vue({
+      el: '#app',
+      data: {
+      },
+      // 注册路由
+      router,
+      methods: {}
+    })
+  </script>
+</body>
+
+</html>

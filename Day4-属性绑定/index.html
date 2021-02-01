@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+  <title>属性绑定</title>
+</head>
+<body>
+  <div id="app">
+    <a v-bind:href="link.href" v-bind:target="link.target">{{ link.content }}</a>
+    <input v-bind:type="input.type">
+    <div :class="classObject" :style="styleObject">Class Object binding</div>
+    <div :class="classArray" :style="[styleObject, styleObject2]">Class Array binding</div>
+  </div>
+
+  <script>
+    // 属性值绑定动态数据 v-bind 或 : 作为简写，绑定的值可以是字符串、对象、数组
+
+    /**
+     * class
+     */
+    // 绑定值为对象 {className1: true/false, className2: true/false}，可同时设置多个 className，通过 true/false 快速切换标签的 class，但新增 newClassName 不方便
+    // 绑定值为数组 ['className1', 'className2']，同时设置多个 className，可以方便地新增其他属性，只需要将 newClassName push 到数组就行，但切换/删除后不方便恢复
+
+    /**
+     * style
+     */
+    // 内联样式 style 也可以绑定对象或数组
+    // 需要指定单位
+    // 绑定和静态的样式，会以绑定优先
+    // 数组允许是对象作为元素
+
+    let vm = new Vue({
+      el: '#app',
+      data() {
+        return {
+          link: {
+            href: 'https://google.com/',
+            target: '_blank',
+            content: 'Google'
+          },
+          input: {
+            type: 'checkbox'
+          },
+          classObject: {
+            aaa: true,
+            bbb: false
+          },
+          classArray: ['ccc', 'ddd'],
+          styleObject: {
+            color: 'blue',
+            // 'font-size': '30px'
+            fontSize: '30px'
+          },
+          styleObject2: {
+            background: 'orange'
+          }
+        }
+      }
+    })
+  </script>
+
+</body>
+</html>

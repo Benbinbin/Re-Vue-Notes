@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>条件渲染与列表渲染</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+</head>
+
+<body>
+  <div id="app">
+    <!-- <h1 v-if="show">Hello Vue</h1>
+    <span v-if="show">description </span> -->
+    <!-- <template v-if="show">
+      <h1>Hello Vue</h1>
+      <span>description </span>
+    </template>
+    <template v-else>
+      <h1>False content</h1>
+      <span>False description </span>
+    </template> -->
+    <h1 v-for="value, index in userListArray">{{ value.name }}</h1>
+    <h1 v-for="value, key in userListObj">{{ key }}</h1>
+    <span v-for="num in 10">{{ num }}, </span>
+  </div>
+  <script>
+    /**
+     * 条件渲染
+     */
+    // v-if 条件性渲染，只有条件为 true 时才渲染元素，DOM 被拔出
+    // v-if，v-else-if，v-else 同级并列元素，但并不推荐直接将条件在页面上进行设置，应该使用 js 控制显示何种数据
+    // v-if 和 v-for 不推荐一起使用，应该和 v-show 配合使用
+    // <template> 可以作为容器，包装需要条件渲染的 DOM，并不会在页面上形成 tag
+
+    // v-show 先渲染再隐藏，display: none，DOM 依然在
+    // 无法使用 <template> 上，由于 v-show 需要元素先渲染，只能用在会实际出现在页面的 tag
+
+    /**
+     * 列表渲染
+     */
+    // v-for 列表渲染 v-for item in arr 或 v-for item of arr
+    // 可以遍历 arr、obj、number（从 1 开始）
+    // 遍历 objList 时候，无法保证每次遍历 item 的先后次序
+    // 设置 key 绑定的是 item 唯一的标识，不要直接用 index
+    // 修改 data 的 arr 需要使用指定的方法（push() pop() shift() unshift() splice() sort() reverse()），Vue 才会侦听，响应式变化
+    new Vue({
+      el: '#app',
+      data: {
+        show: false,
+        userListArray: [
+          {
+            name: 'Ben',
+            gender: 'male'
+          },
+          {
+            name: 'Tom',
+            gender: 'male'
+          }
+        ],
+        userListObj: {
+          ben: 'male',
+          jenny: 'female'
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>

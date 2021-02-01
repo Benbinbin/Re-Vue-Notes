@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>事件绑定与监听</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+</head>
+
+<body>
+  <div id="app">
+    <!-- <h1>{{ count }}</h1> -->
+    <!-- <button @click="count -= 1">Prev</button>
+    <button v-on:click="count += 1">Next</button> -->
+
+    <!-- <button v-for="(content, index) of contents" @click="count = index">{{ index }}</button>
+    <h1>{{ contents[count] }}</h1> -->
+
+    <button v-for="(content, index) of contents" @click="clickHandler2(index, $event)" :data-index="index">{{ index }}</button>
+    <h1>{{ contents[count] }}</h1>
+  </div>
+  <script>
+    /**
+     * 监听事件
+     */
+
+    // 使用 v-on，或使用简写 @，监听 DOM 事件，触发回调函数的调用
+    // 回调函数传递参数，同时需要访问原始 DOM 事件，可以再传递 $event
+
+    // 事件修饰符 .stop .prevent .self .once .capture 可以链式调用多个
+    // .passive 对于 scroll 事件，提高性能
+
+    // 按键修饰符 .enter .tab .delete (捕获“删除”和“退格”键) .esc .space .up .down .left .right .ctrl .alt .shift .meta
+      // 想单纯监听 ctrl，需要使用 keycode 如 keyup.17
+      // .exact 由精确指定的键组合才触发事件
+
+    // 鼠标按钮修饰符 .left .right .middle
+    new Vue({
+      el: '#app',
+      data: {
+        count: 0,
+        total: 4,
+        contents: ['aaa', 'bbb', 'ccc', 'ddd']
+      },
+      methods: {
+        clickHandler(event) {
+          // console.log('click', event);
+          this.count = event.target.dataset.index;
+        },
+         clickHandler2(index, event) {
+          console.log('click', event);
+          this.count = index;
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>路由基础与动态路由</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+  <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+  <style>
+    .router-link-exact-active {
+      background: black;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <!-- 使用 <router-link> 组件来导航，类似于 <a> 标签实现 url 切换，通过传入 to 属性指定路径，可以设置 tag 属性指定渲染为哪一种标签 -->
+    <!-- 当路由激活时（匹配上的），该元素会添加上类名 .router-link-active；而路由准确匹配上的元素则会再加上类名 .router-link-exact-active -->
+    <router-link to="/">Index</router-link>
+    <router-link to="/page1">Page1</router-link>
+    <router-link to="/page2">Page2</router-link>
+    <!-- <a href="/page1">Page1</a> -->
+
+    <!-- 使用 <router-view> 组件，将当前路由匹配的组件渲染在此 -->
+    <router-view></router-view>
+
+  </div>
+  <script>
+    /**
+     * 路由
+     */
+    // 将组件 (components) 映射到路由 (path)
+    // router 实例，可以通过 this.$router 访问路由器
+    // route 路由信息，可以通过 this.$route 访问当前路由
+
+    /**
+     * 动态路由
+     */
+    // 把某种模式（正则表达式）匹配到的所有路由，全都映射到同个组件
+    // 可以通配符 * 匹配任意路径，常用于捕获客户端 404 错误并在页面作出响应
+    // 当使用一个通配符时 $route.params 内会自动添加一个名为 pathMatch 参数
+
+    // 有时候同一个路径可以匹配多个路由，此时匹配的优先级就按照路由的定义顺序：谁先定义的，谁的优先级就最高。匹配顺序由上到下，直到有符合的规则为止。所以使用通配符配符 * 匹配任意路径一般放在最后
+
+    // 定义组件
+    const Index = {
+      template: `<div>Index</div>`
+    };
+    const Page1 = {
+      template: `<div>Page 1</div>`
+    };
+    const Page2 = {
+      template: `<div>Page 2</div>`
+    };
+    const User = {
+      template: `<div>User: {{ $route.params.id }}</div>`
+    };
+    const Error = {
+      template: `<div>404 Not Found</div>`
+    }
+
+    // 创建 router 实例，并传 routes 配置，即路由和组件的映射规则
+    // 每个路由 path 对应一个组件 component
+    const router = new VueRouter({
+      // 路由规则
+      routes: [
+        {
+          path: '/',
+          component: Index
+        },
+        {
+          // 路由网址（url）
+          path: '/page1',
+          // 对应的组件（视图）
+          component: Page1
+        },
+        {
+          path: '/page2',
+          component: Page2
+        },
+        // 动态路由
+        // 动态路径参数以冒号开头，匹配到的参数值会被设置到 this.$route.params 对象中
+        // 都映射到 User 组件
+        // 使用动态路由匹配同一个组件时，如果动态路径参数改变，并不会触发组件重新渲染，而是复用原来的组件，因此组件的生命周期钩子不会再被调用。可以简单地 watch (监测变化) $route 对象来执行原来需要在生命周期钩子的操作。
+        {
+          path: '/user/:id',
+          component: User
+        },
+        {
+          path: '/404',
+          component: Error
+        },
+        {
+          path: '*',
+          redirect: '/404'
+        }
+      ]
+    })
+
+    // 创建和挂载 Vue 根实例
+    new Vue({
+      el: '#app',
+      data: {
+      },
+      // 注册路由
+      router
+    })
+  </script>
+</body>
+
+</html>

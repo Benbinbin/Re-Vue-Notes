@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>嵌套路由与编程式导航</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+  <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+  <style>
+    .router-link-exact-active {
+      color: white;
+      background-color: rgb(67, 211, 247);
+      padding: 5px;
+    }
+
+    .page {
+      margin: 30px;
+      border: 10px solid orange;
+      min-height: 100px;
+      text-align: center;
+      line-height: 100px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+
+    <router-link to="/">Index</router-link>
+    <router-link to="/page1">Page1</router-link>
+    <router-link to="/user">User</router-link>
+    <router-link to="/user/profile">User Profile</router-link>
+    <router-link to="/user/posts">User Posts</router-link>
+    <button @click="clickHandler">User</button>
+
+    <router-view></router-view>
+
+
+  </div>
+  <script>
+    /**
+     * 嵌套路由
+     */
+    // 应用界面常由多层嵌套的组件组合而成，这些嵌套的组件与 URL 中相应的某段路径相映射
+    // 即组件中可以嵌套使用有自己的 <router-view>，而相应的路由-组件映射规则要在该组件对应的路由（父路由）中使用 children 配置
+    // 一般路由 path 会以 / 开头，但嵌套路径不会使用，因为 / 会被当作根路径，这让你充分的使用嵌套组件而无须设置嵌套的路径
+    // 可以嵌套多层路由
+
+    /**
+     * 编程式导航
+     */
+    // 除了使用 <router-link> 创建 a 标签来定义导航链接，我们还可以借助实例 router 的方法，通过编写代码来实现页面 URL 切换。在 Vue 实例内部，你可以通过 $router 访问路由实例
+    // 这些方法是效仿浏览器提供的 API：window.history
+    /**
+     * router.push(location, onComplete?, onAbort?) 导航到指定的 location，并向 history 栈添加一个新的记录
+     * router.replace(location, onComplete?, onAbort?) 导航到指定的 location，它不会向 history 添加新记录，而是替换掉当前的 history 记录
+     * router.go(n) 在 history 记录中向前或者后退多少步，类似 window.history.go(n)，如果输入的数值过大或过小，而 history 记录不够用，跳转就会失败
+     */
+    // 第二个参数 onComplete 是在导航成功完成后执行的回调函数；第三个参数 onAbort 是在导航终止 (导航到相同的路由、或在当前导航完成之前导航到另一个不同的路由) 的时候执行的回调
+    // 如果省略第二个和第三个参数，则router.push 或 router.replace 将返回一个 Promise 以便于针对这次导航动作进行进一步的后续操作。
+
+    // ！！！如果目的地和当前路由相同，只有（动态路由）参数发生了改变，需要使用 beforeRouteUpdate 来响应这个变化 (比如抓取用户信息)。
+
+    // 定义组件
+    const Index = {
+      template: `<div  class="page">Index</div>`
+    };
+    const Page1 = {
+      template: `<div class="page">Page 1</div>`
+    };
+    const User = {
+      template: `<div class="page">
+          <p>User</p>
+          <router-view></router-view>
+        </div>`
+    };
+    const Profile = {
+      template: `<div class="page">Profile</div>`
+    };
+    const Posts = {
+      template: `<div class="page">Posts</div>`
+    }
+
+    // 创建 router 实例
+    const router = new VueRouter({
+      // 路由规则
+      routes: [
+        {
+          path: '/',
+          component: Index
+        },
+        {
+          path: '/page1',
+          component: Page1
+        },
+        {
+          path: '/user',
+          component: User,
+          // 嵌套路由
+          children: [
+            {
+              path: 'profile',
+              component: Profile
+            },
+            {
+              path: 'posts',
+              component: Posts
+            }
+          ]
+        },
+      ]
+    })
+
+    // 创建和挂载 Vue 根实例
+    new Vue({
+      el: '#app',
+      data: {
+      },
+      // 注册路由
+      router,
+      methods: {
+        clickHandler() {
+          this.$router.push('/user', this.completeHandler)
+        },
+        completeHandler() {
+          console.log('complete');
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>实例化 Vue</title>
+</head>
+
+<body>
+  <div id="app">
+    <div id="section1">
+      <span>data1</span>
+      <span>data2</span>
+      <span>data3</span>
+      <span>data4</span>
+      <span>data5</span>
+      <span>data6</span>
+      <span>data7</span>
+      <span>data8</span>
+      <span>data9</span>
+      <span>data10</span>
+    </div>
+    <div id="section2">
+      <span>data1</span>
+      <span>data2</span>
+      <span>data3</span>
+      <span>data4</span>
+      <span>data5</span>
+      <span>data6</span>
+      <span>data7</span>
+      <span>data8</span>
+      <span>data9</span>
+      <span>data10</span>
+    </div>
+    <div id="section3">
+      <span>data1</span>
+      <span>data2</span>
+      <span>data3</span>
+      <span>data4</span>
+      <span>data5</span>
+      <span>data6</span>
+      <span>data7</span>
+      <span>data8</span>
+      <span>data9</span>
+      <span>data10</span>
+    </div>
+    <div id="section4">
+      <span>data1</span>
+      <span>data2</span>
+      <span>data3</span>
+      <span>data4</span>
+      <span>data5</span>
+      <span>data6</span>
+      <span>data7</span>
+      <span>data8</span>
+      <span>data9</span>
+      <span>data10</span>
+    </div>
+    <div id="section5">
+      <p>{{company}} all right preserve {{year}}</p>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+  <script>
+    $(function () {
+
+    })
+  </script>
+  <script>
+      ; (function () {
+        new Vue({
+          el: '#section5',
+          data: {
+            copyright: '版权所有',
+            company: '',
+            year: new Date().getFullYear()
+          },
+          mounted() {
+            fetch('./data.json')
+              .then(response => {
+                console.log(response);
+                return response.json();
+              })
+              .then(data => {
+                console.log(data);
+                this.company = data.company;
+              })
+          }
+        })
+      })()
+      // 使用 <script> 标签引入 Vue（CDN 形式）
+      // 实例化 Vue
+      // el 挂载的 DOM 对象，手动挂载使用 Vue 实例方法 vm.$mount(el)
+      // data 响应式数据
+  </script>
+</body>
+
+</html>

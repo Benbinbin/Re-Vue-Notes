@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>总结与项目</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+</head>
+
+<body>
+  <div id="app">
+    <p><input type="text" v-model="inputText" @keyup.enter="inputHandler"></p>
+    <p>
+      <button @click="show='all'">全部</button>
+      <button @click="show='open'">未完成</button>
+      <button @click="show='done'">已完成</button>
+    </p>
+    <ul>
+      <li v-for="item of filterList" :key="item.timestamp">
+        <template v-if="editing === item">
+          <input type="text" v-model="editingText">
+          <button @click="completeHandler">完成</button>
+          <button @click="cancelHandler">取消</button>
+        </template>
+        <template v-else>
+          <input type="checkbox" name="" id="" v-model="item.status">
+          {{ item.content }}
+          <button @click="editHandler(item)">修改</button>
+          <button @click="deleteHandler(item)">删除</button>
+        </template>
+      </li>
+    </ul>
+  </div>
+  <script>
+    /**
+     * ToDoList
+     * CRUD
+     */
+
+    // input 区分在中文输入法时按下 enter 选字和一般情况下按下 enter 以确认
+    // 监听事件 @compositionstart 和 @compositionend 来判断输入法的开启与关闭
+    new Vue({
+      el: '#app',
+      data: {
+        inputText: '',
+        list: [],
+        editing: null,
+        editingText: '',
+        show: 'all'
+      },
+      methods: {
+        // create
+        inputHandler() {
+          this.list.push({
+            content: this.inputText,
+            timestamp: new Date().getTime(),
+            status: false
+          });
+          this.inputText = '';
+        },
+        // update
+        editHandler(item) {
+          this.editing = item;
+          this.editingText = item.content
+        },
+        cancelHandler() {
+          this.editing = null;
+          this.editingText = '';
+        },
+        completeHandler() {
+          this.list[this.editing].content = this.editingText;
+          this.editing = null;
+          this.editingText = '';
+        },
+        // delete
+        deleteHandler(item) {
+          let index = this.list.findIndex(elem => {
+            return elem === item;
+          });
+          this.list.splice(index, 1);
+        }
+      },
+      computed: {
+        filterList() {
+          // all, inactive, done
+          if (this.show === 'all') {
+            return this.list;
+          } else if (this.show === 'open') {
+            return this.list.filter(item => {
+              return item.status === false;
+            })
+          } else if (this.show === 'done') {
+            return this.list.filter(item => {
+              return item.status === true;
+            })
+          } else {
+            return []
+          }
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>

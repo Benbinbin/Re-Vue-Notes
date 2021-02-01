@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>模板语法</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+</head>
+
+<body>
+  <div id="app">
+    <p>{{ msg }}</p>
+  </div>
+  <script>
+    let vm = new Vue({
+      // el: '#app',
+      // template: '<span style="color: red">This should be red.</span>',
+      data: {
+        msg: 'Hello Vue',
+      }
+    })
+    vm.$mount('#app')
+    /**
+     * 多种渲染 template 的方式
+     */
+    // 1. el + html template
+    // 2. el + template option（取代掉 el 指定的 dom）
+    // 3. template option + vm.$mount(el)（取代掉 el 指定的 dom）
+  </script>
+</body>
+
+</html>

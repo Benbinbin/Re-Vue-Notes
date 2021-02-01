@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>State 与 Getter</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+  <!-- 引入 Vue 后再引入相关的插件 -->
+  <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+  <script src="https://unpkg.com/vuex/dist/vuex.js"></script>
+</head>
+
+<body>
+  <div id="app">
+    <p>{{ count }}</p>
+    <p>{{ storeCount }}</p>
+  </div>
+  <script>
+    /**
+     * store
+     */
+    // Vuex 的核心就是仓库 store 基本上就是一个容器，它使用单一状态树，即每个 Vue 应用中只有一个 store 实例（对象），包含全部的应用层级共享的状态 state 和修改状态的相关方法。
+    // ！！！单状态树和模块化并不冲突
+
+    // 实例化一个仓库，其中存放着组件共享的状态和修改状态的相关方法
+    // const store = new Vuex.Store({
+    //   state: {},
+    //   getters: {},
+    //   mutations: {},
+    //   actions: {}
+    // })
+
+
+
+    /**
+     * State
+     */
+    // 共享的状态存储在 store 的属性 state 中
+    // 在组件中通过 store.state.stateName 访问具体的状态（属性）。由于 Vuex 的状态存储是响应式的，所以一般将 store 实例中读取的状态作为 Vue 实例的计算属性的返回某个状态，每当 store.state.stateName 变化的时候, 相应的计算属性也会重新计算，并且触发更新相关联的 DOM。
+    // ！！！然而，这种模式导致组件依赖全局状态单例。在模块化的构建系统中，在每个需要使用 state 的组件中需要频繁地导入，并且在测试组件时需要模拟状态。
+
+    // Vuex 提供的辅助函数 mapState 更方便地生成计算属性，该函数可以传递对象也可以传递数组：
+
+    // 传递对象（键值对有多种方式）
+    // computed: mapState({
+    //   // 使用箭头函数，以 state 作为传入的参数，返回所需的 state 中一个属性
+    //   count: state => state.count,
+
+    //   // 直接以 state 的属性的字符串形式作为值
+    //   countAlias: 'count',
+    //   // 使用常规函数，以 state 作为传入的参数，为了能够使用 this 获取组件的局部状态
+    //   countPlusLocalState(state) {
+    //     return state.count + this.localCount
+    //   }
+    // })
+
+    // 传递数组（映射的计算属性的名称与 state 的属性名相同）
+    // computed: mapState([
+    //   'count'
+    // ])
+    // mapState 函数返回的是一个对象，如果要与组件中的局部计算属性混合，可以利用对象展开运算符解构 mapState 返回的对象
+    // computed: {
+    //   localComputed() {...},
+    //   ..mapState({...})
+    // }
+
+    // ！！！存储在 Vuex 中的数据状态 state 和 Vue 实例中的 data 遵循相同的规则，对象必须是纯粹 (plain) 的
+
+    // 可以为 Vue 实例（根组件）添加 store 选项，Vue 会将状态从根组件「注入」到每一个子组件中，然后就可以在相应的所有子组件中通过 this.$store 访问仓库
+    // new Vue({
+    //   el: '#app',
+    //   store: store,
+    // })
+
+
+
+    /**
+     * Getter
+     */
+    // Getter 定义在 store 的属性 getters 中
+    // 在组件中可以以属性的形式访问具体的 Getter：store.getters.getterName 访问；也可以以调用方法的形式访问 Getter：store.getters.getterName(params) 访问具体的（对应定义的 Getter 返回的是一个函数）
+
+    // 由于有时候需要从 store 中的 state 中派生出一些状态，且有多个组件需要用到此属性，那么可以在 store 的属性 getters 中定义 Getter。
+    // Getter 函数接受的第一个参数是 state 对象，最后返回一个值或一个函数。当 Getter 通过属性的形式访问时，可以认为是 store 的 computed，有依赖缓存的功能，即只有当它的依赖值发生了改变才会被重新计算；而 Getter 通过方法的形式调用时，可以认为是 store 的 methods，每次都会去进行调用，而不会缓存结果。
+
+    // Getter 函数还可以接受其他 getter 作为第二个参数
+
+    // Vuex 提供的辅助函数 mapGetters 将 store 中的 getter 映射到局部计算属性，也是可以传递对象或字符串数组
+
+    // 可以为 Vue 实例（根组件）添加 store 选项，Vue 会将状态从根组件「注入」到每一个子组件中，然后就可以在相应的所有子组件中通过 this.$store 访问仓库
+    // new Vue({
+    //   el: '#app',
+    //   store: store,
+    // })
+
+    // 发变化也仅仅是在组件的 methods 中提交 mutation（！！！不能直接修改 state）。
+
+    const data = {
+      count: 0,
+    }
+
+    // 实例化 store
+    const store = new Vuex.Store({
+      // 状态
+      state: {
+        count: 1,
+        numbers: [0, 1, 2, 3, 4, 5, 6]
+      },
+      // Getter
+      getters: {
+        oddNumbers(state) {
+          return state.numbers.filter((num) => {
+            return num % 2
+          })
+        },
+        evenNumbers(state) {
+          return state.numbers.filter((num) => {
+            return (num % 2) - 1
+          })
+        }
+      }
+    });
+
+    // 创建和挂载 Vue 根实例
+    new Vue({
+      el: '#app',
+      data,
+      // 注册 store
+      store,
+      // computed: {
+      //   storeCount() {
+      //     return this.$store.state.count
+      //   }
+      // },
+
+      // 使用 mapState 函数，如果是调用了 Vue.use(Vuex) 可以直接调用辅助函数，否则应该通过 Vuex.mapState 调用
+      computed: Vuex.mapState({
+        // storeCount: state => state.Count,
+        storeCount: 'count',
+        // storeCount(state) {
+        //   return state.count;
+        // }
+      })
+    })
+  </script>
+</body>
+
+</html>

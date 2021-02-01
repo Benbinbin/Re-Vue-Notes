@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>插槽</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+</head>
+
+<body>
+  <div id="app">
+    <!-- <basic-component title="Ben"></basic-component> -->
+    <basic-component title="Ben">
+      <!-- Hello World! -->
+      <template v-slot:header>
+        <h1>Title</h1>
+      </template>
+      <template v-slot:default="slotProps">
+        <p>{{slotProps.data.first}}</p>
+      </template>
+      <template v-slot:[slot]>
+        <span style="color: rgb(158, 158, 158)">Footer content</span>
+      </template>
+    </basic-component>
+  </div>
+  <script>
+    /**
+     * 插槽
+     */
+    // 插槽 slot 是 Vue 实现的一套内容分发的 API，一般用于组件作为布局 layout 使用
+
+    // 在定义组件的模板时可以使用 <slot></slot> 标签作为「占位符」，然后在引用组件时，内嵌在组件 <componentName>content</componentName> 中的内容 content 会替代 slot 标签，渲染出来。在引用组件替换插槽时，插入的内容可以是 HTML，也包含模板代码或其他组件
+    // 如果组件定义模板时没有包含一个 <slot> 元素，则引用该组件时，组件起始标签和结束标签之间的任何内容都会被抛弃。
+
+    // 可以为插槽设置默认内容，只有引用组件提供插入内容才会替换默认内容
+
+    // 可以在组件定义的模板中设置多个插槽，即使用具名插槽  <slot name="slotName"></slot>，然后在引用组件时，使用 <template> 元素作为容器（该标签本身不会被渲染到页面上），并以带参数的指令 v-slot:slotName 的形式 <template v-slot:slotName>content</template> 提供需要替换的相应的插槽的名称。
+    // 指定插槽名时可以使用动态生成的名称 <template v-slot:[dynamicSlotName]>content</template>
+    // 类似地，引用组件时在 <template> 标签使用 v-slot:slotName 指令指定具名插槽时，可以使用缩写 #slotName
+    // 当模板中存在多个插槽 <slot> 时，可以有一个不具名插槽作为默认（带有隐含的名字 default）。在引用组件时，任何没有被包裹在带有 v-slot:slotName 的 <template> 中的内容都会被视为默认插槽的内容。
+
+    // 由于引用组件时，是在父层指定插入的内容，所以这些内容现在父级作用域进行编译，它们只能访问父层的数据。
+    // 如果希望引用组件时时可以访问子组件中才有的数据，需要使用作用域插槽。即在定义组件的模板时在插槽 <slot v-bind:variable="value"> 中预先绑定可以使用的数据，这些绑定到 <slot> 的 attribute 称为插槽 props；然后在引用组件时，可以通过 <template v-slot:slotName="obj"> 方式定义一个对象，它包含所有绑定的插槽 props，然后就可以通过 obj.variable 的方式来读取子作用域才有的数据。除了使用 obj 「接收」内层抛出的所有 props，还可以使用 ES6 解构的方式 {key} 直接获取单个 prop，便于后面调用
+
+    Vue.component('BasicComponent', {
+      // template: `
+      //   <div>
+      //     {{ title }} <slot>Default text</slot>
+      //   </div>
+      // `,
+      template: `
+        <div>
+          {{ title }}
+          <header>
+            <slot name="header">Header part</slot>
+          </header>
+          <main>
+            <slot v-bind:data="insideData">Mr.{{ insideData.last}}</slot
+          </main>
+          <footer>
+            <slot name="footer">Footer part</slot>
+          </footer>
+        </div>
+      `,
+      props: {
+        title: {
+          type: String,
+          required: true
+        }
+      },
+      data() {
+        return {
+          msg: 'World',
+          insideData: {
+            first: 'Ben',
+            last: 'Thomson'
+          }
+        }
+      }
+    })
+
+    new Vue({
+      el: '#app',
+      data: {
+        slot: 'footer'
+      },
+      methods: {}
+    })
+  </script>
+</body>
+
+</html>
